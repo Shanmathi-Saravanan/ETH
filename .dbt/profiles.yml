@@ -1,0 +1,13 @@
+eth:
+  target: ci
+  outputs:
+    ci:
+      type: snowflake
+      account: JNSMHVJ-VO98306
+      user: SHANMATHI
+      database: CI
+      warehouse: compute_wh
+      role: ACCOUNTADMIN
+      schema: CI_Schema
+      threads: 1
+      private_key_path: "{{ env_var('DBT_PRIVATE_KEY_PATH') }}"
