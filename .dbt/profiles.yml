@@ -4,7 +4,7 @@ eth:
     ci:
       type: snowflake
       account: "{{ env_var('DBT_SNOWFLAKE_IDENTIFIER')}}"
-      user: SHANMATHI
+      user: "{{ env_var('DBT_SNOWFLAKE_USER')}}"
       database: CI
       warehouse: compute_wh
       role: "{{ env_var('DBT_SNOWFLAKE_ROLE')}}"
