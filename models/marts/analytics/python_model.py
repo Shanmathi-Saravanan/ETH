@@ -8,7 +8,9 @@ def is_holiday(date_col):
 
 def model(dbt, session):
 
-    dbt.config(packages=['holidays'])
+    dbt.config(
+    materialized="table",
+    packages=["holidays", "pandas"])
     my_sql_model_df = dbt.ref("stablecoin_activity_per_day")
 
     my_sql_model_df = my_sql_model_df.to_pandas()
