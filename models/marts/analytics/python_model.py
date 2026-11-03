@@ -1,23 +1,27 @@
 import holidays
-
-def is_holiday(date_col):
-    # Chez Jaffle
-    french_holidays = holidays.France()
-    is_holiday = (date_col in french_holidays)
-    return is_holiday
+from snowflake.snowpark.functions import udf, col
+from snowflake.snowpark.types import BooleanType
 
 def model(dbt, session):
 
     dbt.config(
-    materialized="table",
-    packages=["holidays", "pandas"])
-    my_sql_model_df = dbt.ref("stablecoin_activity_per_day")
+        materialized="table",
+        packages=["holidays"]
+    )
 
-    my_sql_model_df = my_sql_model_df.to_pandas()
+    @udf(
+        packages=["holidays"],
+        return_type=BooleanType(),
+        session=session
+    )
+    def is_holiday(date_col):
+        return date_col in holidays.France()
 
-    my_sql_model_df["is_holiday"] = my_sql_model_df["DATE"].apply(is_holiday)
+    df = dbt.ref("stablecoin_activity_per_day")
 
+    df = df.with_column(
+        "IS_HOLIDAY",
+        is_holiday(col("DATE"))
+    )
 
-
-    return my_sql_model_df
-	
+    return df
