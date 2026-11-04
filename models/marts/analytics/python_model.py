@@ -6,7 +6,7 @@ def model(dbt, session):
 
     dbt.config(
         materialized="table",
-        packages=["holidays"]
+        packages=["holidays"],
         python_version="3.10"
     )
 
