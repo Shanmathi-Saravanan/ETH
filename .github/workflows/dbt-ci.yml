@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0   # needed so we can access master too
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -45,6 +47,15 @@ jobs:
       - name: Run dbt debug
         run: dbt debug --target ci
       
+      
+      - name: Create state manifest from master
+        run: |
+          mkdir -p state
+          git checkout master
+          dbt deps
+          dbt parse --target prod
+          cp target/manifest.json state/manifest.json
+          git checkout -     
       
       - name: Run dbt seed
         run: dbt seed --target ci
