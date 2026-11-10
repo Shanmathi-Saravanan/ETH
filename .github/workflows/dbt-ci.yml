@@ -53,9 +53,8 @@ jobs:
            git checkout master
            dbt deps
            dbt parse --target prod
-           mkdir -p state
-           cp target/manifest.json state/manifest.json/
-
+           mkdir -p /tmp/dbt_state
+           cp target/manifest.json /tmp/dbt_state/manifest.json
 
            git reset --hard
            git checkout -
@@ -65,4 +64,8 @@ jobs:
         run: dbt seed --target ci
 
       - name: Run dbt
-        run: dbt build --target ci
+         run: |
+          dbt build \
+          --target ci \
+          --state /tmp/dbt_state \
+          --select state:modified+
