@@ -27,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: "3.12.10"
 
       - name: Install dbt
         run: |
@@ -46,26 +46,30 @@ jobs:
 
       - name: Run dbt debug
         run: dbt debug --target ci
-      
-      
+
       - name: Create state manifest from master
         run: |
-           git checkout master
-           dbt deps
-           dbt parse --target prod
-           mkdir -p /tmp/dbt_state
-           cp target/manifest.json /tmp/dbt_state/manifest.json
+          git checkout master
+          dbt deps
+          dbt parse --target prod
+          mkdir -p state
+          cp target/manifest.json state/manifest.json
+          git checkout -
 
-           git reset --hard
-           git checkout -
+      # ---- Clone incrementals first (so is_incremental() is true) ----
+      - name: Clone impacted incremental models into PR schema
+        run: |
+          dbt clone \
+            --target ci \
+            --state ./state \
+            --defer \
+            --select "state:modified+,config.materialized:incremental,state:old"
 
-      
-      - name: Run dbt seed
-        run: dbt seed --target ci
-
-      - name: Run dbt
+      # ---- Then slim build ----
+      - name: Slim build (modified + downstream)
         run: |
           dbt build \
-          --target ci \
-          --state /tmp/dbt_state \
-          --select state:modified+
+            --target ci \
+            --state ./state \
+            --defer \
+            --select "state:modified+"
