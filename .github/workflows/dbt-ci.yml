@@ -64,7 +64,7 @@ jobs:
         run: dbt seed --target ci
 
       - name: Run dbt
-         run: |
+        run: |
           dbt build \
           --target ci \
           --state /tmp/dbt_state \
