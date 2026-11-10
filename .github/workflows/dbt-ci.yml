@@ -50,12 +50,16 @@ jobs:
       
       - name: Create state manifest from master
         run: |
-          git checkout master
-          dbt deps
-          dbt parse --target prod
-          mkdir -p state
-          cp target/manifest.json state/manifest.json
-          git checkout -     
+           git checkout master
+           dbt deps
+           dbt parse --target prod
+           mkdir -p state
+           cp target/manifest.json state/manifest.json/
+
+
+           git reset --hard
+           git checkout -
+
       
       - name: Run dbt seed
         run: dbt seed --target ci
